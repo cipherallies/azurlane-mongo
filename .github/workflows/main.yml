@@ -24,7 +24,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - name: Download & install MongoDB tools
       run: |
-        wget https://repo.mongodb.org/apt/ubuntu/dists/bionic/mongodb-org/4.2/multiverse/binary-amd64/mongodb-org-tools_4.2.2_amd64.deb 
+        wget --quiet https://repo.mongodb.org/apt/ubuntu/dists/bionic/mongodb-org/4.2/multiverse/binary-amd64/mongodb-org-tools_4.2.2_amd64.deb 
         sudo dpkg -i mongodb-org-tools_4.2.2_amd64.deb
     - name: Install Lua
       run: sudo apt-get install -qq lua5.3 > /dev/null
@@ -35,3 +35,7 @@ jobs:
         USER: ${{ secrets.USER }}
         PASSWORD: ${{ secrets.PASSWORD }}
         LUA_EXE: lua5.3
+    - uses: actions/upload-artifact@v1
+      with:
+        name: json
+        path: ${{ runner.temp }}/al
