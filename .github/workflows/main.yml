@@ -1,0 +1,37 @@
+name: Update database
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [12.x]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Checkout dataset
+      shell: bash
+      run: |
+        git submodule sync --recursive
+        git submodule update --init --force --recursive --depth=1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Download & install MongoDB tools
+      run: |
+        wget https://repo.mongodb.org/apt/ubuntu/dists/bionic/mongodb-org/4.2/multiverse/binary-amd64/mongodb-org-tools_4.2.2_amd64.deb 
+        sudo dpkg -i mongodb-org-tools_4.2.2_amd64.deb
+    - name: Install Lua
+      run: sudo apt-get install -qq lua5.3 > /dev/null
+    - run: npm install
+    - run: npm start
+      env:
+        HOST: ${{ secrets.HOST }}
+        USER: ${{ secrets.USER }}
+        PASSWORD: ${{ secrets.PASSWORD }}
+        LUA_EXE: lua5.3

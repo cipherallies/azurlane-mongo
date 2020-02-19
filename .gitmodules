@@ -1,0 +1,6 @@
+[submodule "AzurLaneData"]
+	path = AzurLaneData
+	url = https://github.com/Dimbreath/AzurLaneData.git
+[submodule "lua/json"]
+	path = lua/json
+	url = https://github.com/Egor-Skriptunoff/json4lua
