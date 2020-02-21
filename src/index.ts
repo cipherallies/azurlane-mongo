@@ -22,10 +22,15 @@ readdirSync(s).forEach(/** client locale */ variation => {
 
     mkdirSync(baseOut)
     readdirSync(basePath).forEach(fileName => {
-        sleep(10000);
         const fullPath = join(basePath, fileName);
         process.stdout.write(`\nProcessing ${chalk.green(fileName)}`);
-        let json = execSync(`${LUA_EXE} main.lua ${resolve(fullPath)}`, { cwd: './lua', encoding: 'utf8', maxBuffer: Infinity });
+        let json : string = ''; 
+        try {
+            json = execSync(`${LUA_EXE} main.lua ${resolve(fullPath)}`, { cwd: './lua', encoding: 'utf8', maxBuffer: Infinity });
+        } catch {
+            process.stdout.write(` | Error occurred, skipping`);
+            return;
+        }
         let base = basename(fileName, '.lua');
         const out = join(baseOut, `${base}.json`);
         writeFileSync(out, json);
