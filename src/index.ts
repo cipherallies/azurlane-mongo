@@ -1,8 +1,9 @@
 import { config } from 'dotenv'; config();
 import { execSync } from 'child_process';
-import { readdirSync, mkdirSync, writeFileSync, statSync, readFileSync, unlinkSync } from 'fs';
+import { readdirSync, mkdirSync, writeFileSync, statSync, readFileSync, unlinkSync, rmdirSync } from 'fs';
 import { basename, join, resolve } from 'path';
 import chalk from 'chalk';
+import rr from 'rimraf';
 
 const { LUA_EXE, HOST, USER, PASSWORD } = process.env
 const cwd = process.cwd()
@@ -56,6 +57,8 @@ readdirSync(workDir).forEach(locale => {
         console.log(`Repacked ${p}.`)
     })
 })
+
+rr.sync(join(workDir, 'zh-CN'));
 
 readdirSync(workDir).forEach(locale => {
     readdirSync(join(workDir, locale)).forEach(jsonRecord => {
