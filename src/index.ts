@@ -1,6 +1,6 @@
 import { config } from 'dotenv'; config();
 import { execSync } from 'child_process';
-import { readdirSync, mkdirSync, writeFileSync, statSync } from 'fs';
+import { readdirSync, mkdirSync, writeFileSync, statSync, readFileSync, unlinkSync } from 'fs';
 import { basename, join, resolve } from 'path';
 import chalk from 'chalk';
 
@@ -32,5 +32,27 @@ readdirSync(s).forEach(/** client locale */ variation => {
         const out = join(baseOut, `${base}.json`);
         writeFileSync(out, json);
         process.stdout.write(` | Completed -> ${variation}/${chalk.yellow(`${base}.json`)}`)
+    })
+})
+
+function pressF (l: string, p: string) {
+    console.log(l);
+    unlinkSync(p);
+}
+
+readdirSync(workDir).forEach(locale => {
+    readdirSync(join(workDir, locale)).forEach(jsonRecord => {
+        let f = join(workDir, locale, jsonRecord);
+        let a = JSON.parse(readFileSync(f, { encoding: 'utf8' })),
+            p = `${locale}/${jsonRecord}`
+        const base = basename(jsonRecord, '.json');
+        if (!a[base]) return pressF(`Property ${base} not found in ${p}. It will be deleted.`, f)
+
+        let r = a[base].all
+        if (!r) return pressF(`Dataset full description not found in ${p}. Deleting.`, f)
+        if (!Array.isArray(r)) return pressF(`Full description not an array in ${p}. Deleting.`, f)
+        let out = r.map(id => a[base][id]);
+        writeFileSync(f, JSON.stringify(out));
+        console.log(`Repacked ${p}.`)
     })
 })
