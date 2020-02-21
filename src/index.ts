@@ -4,7 +4,7 @@ import { readdirSync, mkdirSync, writeFileSync, statSync, readFileSync, unlinkSy
 import { basename, join, resolve } from 'path';
 import chalk from 'chalk';
 
-const { LUA_EXE } = process.env
+const { LUA_EXE, HOST, USER, PASSWORD } = process.env
 const cwd = process.cwd()
 const s = join(cwd, 'AzurLaneData'), workDir = join(process.env.RUNNER_TEMP, 'al');
 mkdirSync(workDir);
@@ -54,5 +54,20 @@ readdirSync(workDir).forEach(locale => {
         let out = r.map(id => a[base][id]);
         writeFileSync(f, JSON.stringify(out));
         console.log(`Repacked ${p}.`)
+    })
+})
+
+readdirSync(workDir).forEach(locale => {
+    readdirSync(join(workDir, locale)).forEach(jsonRecord => {
+        let f = join(workDir, locale, jsonRecord);
+
+        const collectionName = basename(jsonRecord, '.json')
+        const cmd = `mongoimport --host ${HOST} --port 27017 --username ${USER} --password ${PASSWORD} --ssl --collection ${
+            collectionName
+        } --file ${f} --jsonArray --drop --authenticationDatabase admin --db ${locale}`
+        try { execSync(cmd, { stdio: 'inherit' }) }
+        catch {
+            console.log(`Failed: ${chalk.green(f)} to ${locale}.${chalk.yellow(collectionName)}`)
+        }
     })
 })
