@@ -9,9 +9,6 @@ const cwd = process.cwd()
 const s = join(cwd, 'AzurLaneData'), workDir = join(process.env.RUNNER_TEMP, 'al');
 mkdirSync(workDir);
 
-async function sleep(ms: number) {
-    return await new Promise(r => setTimeout(r, ms));
-}
 
 readdirSync(s).forEach(/** client locale */ variation => {
     const l = join(s, variation);
@@ -23,7 +20,7 @@ readdirSync(s).forEach(/** client locale */ variation => {
     mkdirSync(baseOut)
     readdirSync(basePath).forEach(fileName => {
         const fullPath = join(basePath, fileName);
-        process.stdout.write(`\nProcessing ${chalk.green(fileName)}`);
+        process.stdout.write(`\nProcessing ${variation}/${chalk.green(fileName)}`);
         let json : string = ''; 
         try {
             json = execSync(`${LUA_EXE} main.lua ${resolve(fullPath)}`, { cwd: './lua', encoding: 'utf8', maxBuffer: Infinity });
@@ -34,6 +31,6 @@ readdirSync(s).forEach(/** client locale */ variation => {
         let base = basename(fileName, '.lua');
         const out = join(baseOut, `${base}.json`);
         writeFileSync(out, json);
-        process.stdout.write(` | Completed -> ${chalk.yellow(`${base}.json`)}`)
+        process.stdout.write(` | Completed -> ${variation}/${chalk.yellow(`${base}.json`)}`)
     })
 })
