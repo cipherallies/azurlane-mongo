@@ -58,7 +58,9 @@ readdirSync(workDir).forEach(locale => {
     })
 })
 
-rr.sync(join(workDir, 'zh-CN'));
+rr.sync(join(workDir, 'ja-JP'));
+rr.sync(join(workDir, 'zh-TW'));
+rr.sync(join(workDir, 'ko-KR'));
 
 readdirSync(workDir).forEach(locale => {
     readdirSync(join(workDir, locale)).forEach(jsonRecord => {
