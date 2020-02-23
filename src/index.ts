@@ -49,10 +49,17 @@ readdirSync(workDir).forEach(locale => {
         const base = basename(jsonRecord, '.json');
         if (!a[base]) return pressF(`Property ${base} not found in ${p}. It will be deleted.`, f)
 
-        let r = a[base].all
-        if (!r) return pressF(`Dataset full description not found in ${p}. Deleting.`, f)
-        if (!Array.isArray(r)) return pressF(`Full description not an array in ${p}. Deleting.`, f)
-        let out = r.map(id => a[base][id]);
+        let r = a[base].all;
+        let out = [];
+        if ((!r) || !Array.isArray(r)) {
+            console.log(`Valid full description could not be found in ${p}. Attempting key discovery instead.`)
+            let k = Object.keys(a[base]);
+            k.forEach(m => out.push(
+                Object.assign({}, { id: m }, a[base][m])
+            ))
+        } else {
+            out = r.map(id => a[base][id]);
+        }
         writeFileSync(f, JSON.stringify(out));
         console.log(`Repacked ${p}.`)
     })
